@@ -1,0 +1,86 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      args:
+        USER_ID: ${WWWUSER:-1000}
+        GROUP_ID: ${WWWGROUP:-1000}
+        USER: ${USER:-appuser}
+    container_name: pusher-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "9000:9000"
+      - "5173:5173"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/php/config/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - pusher_network
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - APP_ENV=local
+      - DB_HOST=db
+
+  nginx:
+    image: nginx:1.19-alpine
+    container_name: pusher-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx:/etc/nginx/conf.d
+    networks:
+      - pusher_network
+    depends_on:
+      - app
+
+  db:
+    container_name: pusher-db
+    image: mysql:8.0
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-pusherdb}
+      MYSQL_USER: ${DB_USERNAME:-pusher}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
+    networks:
+      - pusher_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pusher-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-secret}
+    depends_on:
+      - db
+    networks:
+      - pusher_network
+
+networks:
+  pusher_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

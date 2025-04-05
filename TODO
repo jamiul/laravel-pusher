@@ -1,0 +1,5 @@
+
+Todo:
+  ✔ 1. Set up a New Laravel Project @done(25-04-05 18:17)
+  ☐ 2. Install Necessary Packages
+  docker exec -it --user root pusher-app bash

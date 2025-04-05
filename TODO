@@ -1,11 +1,11 @@
 
 Todo:
-  ✔ 1. Set up a New Laravel Project @done(25-04-05 18:17)
-  ✔ 2. Install Necessary Packages @done(25-04-06 00:30)
-  ✔ 3. Set up Pusher @done(25-04-06 00:33)
-  ✔ 4. Create a Product Model & Migration @done(25-04-06 00:33)
-  5. Create a Controller
-  6. Create Events & Listeners
-  7. Create a Blade View
-  8. Testing
+  ✔ 1. Set up a New Laravel Project
+  ✔ 2. Install Necessary Packages
+  ✔ 3. Set up Pusher
+  ✔ 4. Create a Product Model & Migration
+  ✔ 5. Create a Controller
+  ✔ 6. Create Events & Listeners
+  ✔ 7. Create a Blade View
+  ✔ 8. Testing
   docker exec -it --user root pusher-app bash

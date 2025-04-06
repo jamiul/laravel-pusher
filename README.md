@@ -28,6 +28,17 @@ composer install
 npm install && npm run dev
 ```
 
+### Test on Browser
+```bash
+Visit http://localhost/products to see your application
+
+Test real-time functionality:
+
+Open the application in multiple browser windows
+Click "Add Random Product" in one window
+The new product should appear in all windows without refreshing
+```
+
 Stop the server
 
 ```bash

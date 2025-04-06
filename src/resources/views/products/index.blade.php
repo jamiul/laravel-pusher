@@ -1,3 +1,7 @@
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 @extends('products.layouts.app')
 
 @section('content')

@@ -1,48 +1,89 @@
 @extends('products.layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>Products</h2>
+                        <h2 class="mb-0">Products</h2>
                         <div>
                             <a href="{{ route('products.fetch') }}" class="btn btn-primary">Fetch All Products</a>
-                            <a href="{{ route('products.add-random') }}" class="btn btn-success ml-2">Add Random Product</a>
+                            <a href="{{ route('products.add-random') }}" class="btn btn-success ms-2">Add Random Product</a>
                         </div>
                     </div>
                 </div>
 
                 <div class="card-body">
                     @if (session('success'))
-                        <div class="alert alert-success" role="alert">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
 
-                    <div class="row" id="products-container">
+                    <div class="row g-4" id="products-container">
                         @foreach ($products as $product)
-                            <div class="col-md-4 mb-4">
-                                <div class="card h-100">
+                            <div class="col-md-4">
+                                <div class="card h-100 shadow-sm hover-shadow transition">
                                     @if ($product->image)
                                         <img src="{{ $product->image }}" class="card-img-top" alt="{{ $product->title }}" style="height: 200px; object-fit: contain; padding: 10px;">
                                     @endif
                                     <div class="card-body">
-                                        <h5 class="card-title">{{ $product->title }}</h5>
+                                        <h5 class="card-title text-truncate">{{ $product->title }}</h5>
                                         <p class="card-text">{{ Str::limit($product->description, 100) }}</p>
-                                        <p class="card-text"><strong>Price: ${{ number_format($product->price, 2) }}</strong></p>
+                                        <p class="card-text"><strong class="text-primary">${{ number_format($product->price, 2) }}</strong></p>
+                                        <div class="d-flex justify-content-end gap-2 mt-3">
+                                            <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </a>
+                                            <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this product?')">
+                                                    <i class="bi bi-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
+
+                    @if($products->hasPages())
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <div class="text-muted">
+                                Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} products
+                            </div>
+                            <div>
+                                {{ $products->links('pagination::bootstrap-5') }}
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+.transition {
+    transition: all 0.3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 @endsection
 
 @section('scripts')
@@ -132,11 +173,4 @@
         }
     });
 </script>
-
-<style>
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-</style>
 @endsection
